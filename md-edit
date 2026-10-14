@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+caller_dir=$PWD
+script_path=$(realpath -- "${BASH_SOURCE[0]}")
+script_dir=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
+
+usage() {
+  cat <<EOF
+Usage: md-edit [MARKDOWN_FILE]
+
+With a file, start a collaborative session for that file. Relative paths are
+resolved from the directory where md-edit was invoked.
+
+Without a file, start the HedgeDoc service.
+EOF
+}
+
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+  usage
+  exit 0
+fi
+
+if [[ $# -eq 0 ]]; then
+  exec "$script_dir/start.sh"
+fi
+
+if [[ $# -ne 1 ]]; then
+  usage >&2
+  exit 2
+fi
+
+source_argument=$1
+if [[ $source_argument != /* ]]; then
+  source_argument=$caller_dir/$source_argument
+fi
+
+exec "$script_dir/edit-md.sh" "$source_argument"
