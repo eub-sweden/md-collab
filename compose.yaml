@@ -19,6 +19,7 @@ services:
     environment:
       CMD_DB_URL: postgres://hedgedoc:${MD_EDIT_DB_PASSWORD}@database:5432/hedgedoc
       CMD_DOMAIN: ${MD_EDIT_PUBLIC_HOST:?Run ./configure.sh first}
+      CMD_PORT: ${MD_EDIT_PORT:-3000}
       CMD_PROTOCOL_USESSL: "false"
       CMD_HSTS_ENABLE: "false"
       CMD_URL_ADDPORT: "true"
@@ -29,7 +30,7 @@ services:
       CMD_DEFAULT_PERMISSION: ${MD_EDIT_DEFAULT_PERMISSION:-freely}
       CMD_ENABLE_STATS_API: "false"
     ports:
-      - "${MD_EDIT_BIND_IP:-0.0.0.0}:3000:3000"
+      - "${MD_EDIT_BIND_IP:-0.0.0.0}:${MD_EDIT_PORT:-3000}:${MD_EDIT_PORT:-3000}"
     volumes:
       - uploads:/hedgedoc/public/uploads
     restart: unless-stopped

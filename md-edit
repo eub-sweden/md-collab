@@ -7,10 +7,11 @@ script_dir=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
 
 usage() {
   cat <<EOF
-Usage: md-edit [MARKDOWN_FILE]
+Usage: md-edit [MARKDOWN_FILE [PUBLIC_HOST[:PORT]]]
 
 With a file, start a collaborative session for that file. Relative paths are
-resolved from the directory where md-edit was invoked.
+resolved from the directory where md-edit was invoked. PUBLIC_HOST[:PORT]
+selects the canonical origin advertised to collaborators.
 
 Without a file, start the HedgeDoc service.
 EOF
@@ -25,7 +26,7 @@ if [[ $# -eq 0 ]]; then
   exec "$script_dir/start.sh"
 fi
 
-if [[ $# -ne 1 ]]; then
+if [[ $# -lt 1 || $# -gt 2 ]]; then
   usage >&2
   exit 2
 fi
@@ -35,4 +36,7 @@ if [[ $source_argument != /* ]]; then
   source_argument=$caller_dir/$source_argument
 fi
 
+if [[ $# -eq 2 ]]; then
+  exec "$script_dir/edit-md.sh" "$source_argument" "$2"
+fi
 exec "$script_dir/edit-md.sh" "$source_argument"

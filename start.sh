@@ -32,7 +32,9 @@ for attempt in {1..60}; do
     ensure_service_started app
 
     public_host=$(sed -n 's/^MD_EDIT_PUBLIC_HOST=//p' .env)
-    echo "HedgeDoc is starting at http://$public_host:3000"
+    public_port=$(sed -n 's/^MD_EDIT_PORT=//p' .env)
+    public_port=${public_port:-3000}
+    echo "HedgeDoc is starting at http://$public_host:$public_port"
     echo "Follow startup with: ./logs.sh"
     exit 0
   fi

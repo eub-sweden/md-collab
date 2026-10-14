@@ -6,11 +6,11 @@ script_path=$(realpath -- "${BASH_SOURCE[0]}")
 script_dir=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
 
 usage() {
-  echo "Usage: $0 MARKDOWN_FILE" >&2
+  echo "Usage: $0 MARKDOWN_FILE [PUBLIC_HOST[:PORT]]" >&2
   exit 2
 }
 
-[[ $# -eq 1 ]] || usage
+[[ $# -ge 1 && $# -le 2 ]] || usage
 command -v curl >/dev/null 2>&1 || {
   echo "curl is required." >&2
   exit 1
@@ -48,6 +48,10 @@ source_path=$(realpath -- "$source_argument")
 
 cd "$script_dir"
 
+if [[ $# -eq 2 ]]; then
+  ./set-public-host.sh "$2"
+fi
+
 state_root=${MD_EDIT_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/md-edit}
 sessions_dir=$state_root/sessions
 umask 077
@@ -73,7 +77,9 @@ if ! ./start.sh; then
   exit 1
 fi
 
-server_url=http://127.0.0.1:3000
+server_port=$(sed -n 's/^MD_EDIT_PORT=//p' .env)
+server_port=${server_port:-3000}
+server_url=http://127.0.0.1:$server_port
 for attempt in {1..60}; do
   if curl --fail --silent --output /dev/null "$server_url/"; then
     break

@@ -88,6 +88,9 @@ the result back:
 
 ```sh
 md-edit document.md
+md-edit document.md karn.local
+md-edit document.md 10.10.10.10:3000
+md-edit document.md karn.local:8300
 ```
 
 Relative file arguments are resolved from the caller's current directory, not
@@ -95,6 +98,13 @@ from the repository containing the scripts. Calling `md-edit` without a file
 only starts the HedgeDoc service. The command prints a URL to share, then waits.
 Press Enter to export the current HedgeDoc version back to the file; Ctrl-C
 performs the same guarded save.
+
+The optional second argument selects the canonical `HOST[:PORT]` for that
+throw-away collaboration session; the port defaults to 3000. If it differs from
+`.env`, `md-edit` warns that active connections and old-origin URLs will be
+disrupted and asks for confirmation. On approval it updates `.env`, stops the
+old containers while preserving PostgreSQL and uploads, and starts the session
+under the new origin. Rootless container engines may reject ports below 1024.
 
 Before starting HedgeDoc or making a network request, the script keeps an
 untouched copy under:
